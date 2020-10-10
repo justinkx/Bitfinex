@@ -6,33 +6,59 @@ import { orderBookSelector } from "../../Screens/Trading/Selectors";
 import OrderTableCell from "./OrderTableCell";
 
 const OrderBook = () => {
-  const dispatch = useDispatch();
   const orderBook = useSelector((state) => orderBookSelector(state.Trade));
-  console.log(orderBook, "orderBook");
-  const orderBookKeys = Object.keys(orderBook)
-    .filter((item) => item !== undefined)
-    .sort((a, b) => b - a);
+  const orderBookKeys = Object.keys(orderBook).filter(
+    (item) => item !== undefined
+  );
+  console.log("orderBookKeys length >>", orderBookKeys);
   return (
     <ExpandableCard title={"ORDER BOOK"}>
       <View style={[styles.bookContainer]}>
-        <OrderTableCell cellStyle={styles.cellStart} value={"Total"} />
-        <OrderTableCell cellStyle={styles.cellmiddle} value={"Price"} />
-        <OrderTableCell cellStyle={styles.cellmiddle} value={"Price"} />
-        <OrderTableCell value={"Total"} />
+        <OrderTableCell
+          cellText={{ color: "#899094" }}
+          cellStyle={styles.cellStart}
+          value={"Total"}
+        />
+        <OrderTableCell
+          cellText={{ color: "#899094" }}
+          cellStyle={styles.cellmiddle}
+          value={"Price"}
+        />
+        <OrderTableCell
+          cellText={{ color: "#899094" }}
+          cellStyle={styles.cellmiddle}
+          value={"Price"}
+        />
+        <OrderTableCell cellText={{ color: "#899094" }} value={"Total"} />
         {orderBookKeys.map((orderKey, index) => (
-          <OrderTableCell
-            key={orderKey}
-            cellStyle={
-              index % 4 === 0
-                ? styles.cellStart
-                : (index % 4 === 1 || index % 4 === 2) && styles.cellmiddle
-            }
-            value={
-              index % 4 === 0 || index % 4 === 3
-                ? Math.round(orderBook[orderKey]["amount"])
-                : orderBook[orderKey]["price"]
-            }
-          />
+          <React.Fragment key={orderKey}>
+            <OrderTableCell
+              key={index}
+              cellStyle={
+                index % 4 === 0
+                  ? styles.cellStart
+                  : (index % 4 === 1 || index % 4 === 2) && styles.cellmiddle
+              }
+              value={
+                index % 4 === 0 || index % 4 === 3
+                  ? Math.round(orderBook[orderKey]["count"])
+                  : orderBook[orderKey]["price"]
+              }
+            />
+            <OrderTableCell
+              key={index}
+              cellStyle={
+                index % 4 === 0
+                  ? styles.cellStart
+                  : (index % 4 === 1 || index % 4 === 2) && styles.cellmiddle
+              }
+              value={
+                index % 4 === 0 || index % 4 === 3
+                  ? Math.round(orderBook[orderKey]["count"])
+                  : orderBook[orderKey]["price"]
+              }
+            />
+          </React.Fragment>
         ))}
       </View>
     </ExpandableCard>
@@ -44,10 +70,11 @@ export default memo(OrderBook);
 const styles = StyleSheet.create({
   bookContainer: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "flex-start",
+    width: "100%",
     alignItems: "center",
     flexWrap: "wrap",
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
   },
   cellStart: {
     justifyContent: "flex-start",

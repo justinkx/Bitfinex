@@ -15,7 +15,7 @@ const initialState = {
   },
 
   orderBook: {},
-  trades: [],
+  trades: {},
 };
 
 export default function TradeReducer(state = initialState, action) {
@@ -43,12 +43,26 @@ export default function TradeReducer(state = initialState, action) {
       const { orderBook } = action;
       let _orderBook = {};
       Object.assign(_orderBook, state.orderBook);
-
-      orderBook.map((order, index) => {
-        const PRICE = order[0];
-        const COUNT = order[1];
-        const AMOUNT = order[2];
-        if (COUNT === 0) {
+      if (Array.isArray(orderBook[0])) {
+        orderBook.map((order, index) => {
+          const PRICE = order[0];
+          const COUNT = order[1];
+          const AMOUNT = order[2];
+          if (COUNT === 0 && _orderBook[PRICE]) {
+            delete _orderBook[PRICE];
+          } else {
+            _orderBook[PRICE] = {
+              price: PRICE,
+              count: COUNT,
+              amount: AMOUNT,
+            };
+          }
+        });
+      } else {
+        const PRICE = orderBook[0];
+        const COUNT = orderBook[1];
+        const AMOUNT = orderBook[2];
+        if (COUNT === 0 && _orderBook[PRICE]) {
           delete _orderBook[PRICE];
         } else {
           _orderBook[PRICE] = {
@@ -57,15 +71,30 @@ export default function TradeReducer(state = initialState, action) {
             amount: AMOUNT,
           };
         }
-      });
+      }
+
       return {
         ...state,
-        orderBook: { ..._orderBook },
+        orderBook: _orderBook,
       };
     case tradingTypes.SAVE_TRADES:
-      console.log("action.trades", action.trades);
+      let _trades = { ...state.trades };
+      action.trades.map((trade, index) => {
+        const ID = trade[0];
+        const MTS = trade[1];
+        const AMOUNT = trade[2];
+        const PRICE = trade[3];
+        _trades[ID] = {
+          ID,
+          MTS,
+          AMOUNT,
+          PRICE,
+        };
+      });
+
       return {
         ...state,
+        trades: { ..._trades },
       };
     default:
       return { ...state };

@@ -23,12 +23,12 @@ const TradingScreen = () => {
         symbol: "tBTCUSD",
       });
       socket.send(tickerMsg);
-      // const bookMessage = JSON.stringify({
-      //   event: "subscribe",
-      //   channel: "book",
-      //   symbol: "tBTCUSD",
-      // });
-      // socket.send(bookMessage);
+      const bookMessage = JSON.stringify({
+        event: "subscribe",
+        channel: "book",
+        symbol: "tBTCUSD",
+      });
+      socket.send(bookMessage);
       const tradeMessage = JSON.stringify({
         event: "subscribe",
         channel: "trades",
@@ -63,7 +63,6 @@ const TradingScreen = () => {
         } else if (messageData.channel === "book") {
           bookOrderChannelId.current = parseInt(messageData.chanId);
         } else if (messageData.channel === "trades") {
-          console.log("messageData", messageData);
           tradeChannelId.current = parseInt(messageData.chanId);
         }
       }
