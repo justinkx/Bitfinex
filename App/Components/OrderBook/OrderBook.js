@@ -4,15 +4,21 @@ import ExpandableCard from "../ExpandableCard/ExpandableCard";
 import { useDispatch, useSelector } from "react-redux";
 import { orderBookSelector } from "../../Screens/Trading/Selectors";
 import OrderTableCell from "./OrderTableCell";
-
-const OrderBook = () => {
+import socket from "../../WebSocket/Socket";
+const OrderBook = ({ decreasePrecision, increasePrecision, precision }) => {
   const orderBook = useSelector((state) => orderBookSelector(state.Trade));
   const orderBookKeys = Object.keys(orderBook).filter(
     (item) => item !== undefined
   );
-  console.log("orderBookKeys length >>", orderBookKeys);
+
   return (
-    <ExpandableCard title={"ORDER BOOK"}>
+    <ExpandableCard
+      precision={precision}
+      decreasePrecision={decreasePrecision}
+      increasePrecision={increasePrecision}
+      showPrecision={true}
+      title={"ORDER BOOK"}
+    >
       <View style={[styles.bookContainer]}>
         <OrderTableCell
           cellText={{ color: "#899094" }}
@@ -32,32 +38,26 @@ const OrderBook = () => {
         <OrderTableCell cellText={{ color: "#899094" }} value={"Total"} />
         {orderBookKeys.map((orderKey, index) => (
           <React.Fragment key={orderKey}>
-            <OrderTableCell
-              key={index}
-              cellStyle={
-                index % 4 === 0
-                  ? styles.cellStart
-                  : (index % 4 === 1 || index % 4 === 2) && styles.cellmiddle
-              }
-              value={
-                index % 4 === 0 || index % 4 === 3
-                  ? Math.round(orderBook[orderKey]["count"])
-                  : orderBook[orderKey]["price"]
-              }
-            />
-            <OrderTableCell
-              key={index}
-              cellStyle={
-                index % 4 === 0
-                  ? styles.cellStart
-                  : (index % 4 === 1 || index % 4 === 2) && styles.cellmiddle
-              }
-              value={
-                index % 4 === 0 || index % 4 === 3
-                  ? Math.round(orderBook[orderKey]["count"])
-                  : orderBook[orderKey]["price"]
-              }
-            />
+            {index % 2 === 0 ? (
+              <>
+                <OrderTableCell
+                  cellStyle={styles.cellStart}
+                  value={Math.round(orderBook[orderKey]["count"])}
+                />
+                <OrderTableCell
+                  cellStyle={styles.cellmiddle}
+                  value={orderBook[orderKey]["price"]}
+                />
+              </>
+            ) : (
+              <>
+                <OrderTableCell
+                  cellStyle={styles.cellmiddle}
+                  value={Math.round(orderBook[orderKey]["price"])}
+                />
+                <OrderTableCell value={orderBook[orderKey]["count"]} />
+              </>
+            )}
           </React.Fragment>
         ))}
       </View>

@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-const OrderTableCell = ({ value, type = "values", cellStyle, cellText }) => {
+const OrderTableCell = ({ value, cellStyle, cellText }) => {
   return (
     <View style={[styles.cell, cellStyle]}>
       <Text style={[styles.text, cellText]} allowFontScaling={false}>

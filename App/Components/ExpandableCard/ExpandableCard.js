@@ -4,7 +4,14 @@ import { animate } from "../../Utils/Animation";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../Theme/Colors";
 
-const ExpandableCard = ({ title, children }) => {
+const ExpandableCard = ({
+  title,
+  children,
+  showPrecision = false,
+  increasePrecision,
+  decreasePrecision,
+  precision,
+}) => {
   const [open, setOpen] = useState(false);
 
   function toggle() {
@@ -23,28 +30,34 @@ const ExpandableCard = ({ title, children }) => {
             {title}
           </Text>
         </View>
-        <View style={[styles.nameContainer]}>
-          <TouchableOpacity
-            style={[
-              styles.actionButton,
-              {
-                marginRight: 10,
-              },
-            ]}
-          >
-            <Ionicons style={styles.icons} name={"md-remove"} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.actionButton,
-              {
-                marginRight: 10,
-              },
-            ]}
-          >
-            <Ionicons style={styles.icons} name={"md-add"} />
-          </TouchableOpacity>
-        </View>
+        {showPrecision && (
+          <View style={[styles.nameContainer]}>
+            <TouchableOpacity
+              disabled={precision === 0}
+              onPress={decreasePrecision}
+              style={[
+                styles.actionButton,
+                {
+                  marginRight: 10,
+                },
+              ]}
+            >
+              <Ionicons style={styles.icons} name={"md-remove"} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              disabled={precision === 4}
+              onPress={() => increasePrecision()}
+              style={[
+                styles.actionButton,
+                {
+                  marginRight: 10,
+                },
+              ]}
+            >
+              <Ionicons style={styles.icons} name={"md-add"} />
+            </TouchableOpacity>
+          </View>
+        )}
       </TouchableOpacity>
       {open && <View>{children}</View>}
     </View>

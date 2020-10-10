@@ -10,11 +10,14 @@ import OrderBook from "../../Components/OrderBook/OrderBook";
 import { saveTicker, saveOrderBook, saveTrades } from "./Actions";
 import Trades from "../../Components/Trades/Trades";
 
+const precisions = [0, 1, 2, 3, 4];
+
 const TradingScreen = () => {
   const dispatch = useDispatch();
   const tickerChannelId = useRef();
   const bookOrderChannelId = useRef();
   const tradeChannelId = useRef();
+  const [precision, setPrecision] = useState(precisions[0]);
   const connectToSocket = useCallback(() => {
     socket.onopen = (event) => {
       const tickerMsg = JSON.stringify({
@@ -27,6 +30,7 @@ const TradingScreen = () => {
         event: "subscribe",
         channel: "book",
         symbol: "tBTCUSD",
+        precision: `P${precision}`,
       });
       socket.send(bookMessage);
       const tradeMessage = JSON.stringify({
@@ -68,6 +72,49 @@ const TradingScreen = () => {
       }
     };
   }, []);
+  const increasePrecision = useCallback(() => {
+    const nextIndex = precision + 1;
+    if (nextIndex <= 5) {
+      setPrecision(nextIndex);
+      socket.send(
+        JSON.stringify({
+          event: "unsubscribe",
+          channel: "book",
+          symbol: "tBTCUSD",
+        })
+      );
+      const bookMessage = JSON.stringify({
+        event: "subscribe",
+        channel: "book",
+        symbol: "tBTCUSD",
+        precision: `P${nextIndex}`,
+      });
+      socket.send(bookMessage);
+    }
+  }, [precision]);
+
+  const decreasePrecision = useCallback(() => {
+    const nextIndex = precision - 1;
+    if (nextIndex >= 0) {
+      setPrecision(nextIndex);
+      socket.send(
+        JSON.stringify({
+          event: "unsubscribe",
+          channel: "book",
+          symbol: "tBTCUSD",
+        })
+      );
+
+      const bookMessage = JSON.stringify({
+        event: "subscribe",
+        channel: "book",
+        symbol: "tBTCUSD",
+        precision: `P${nextIndex}`,
+      });
+      socket.send(bookMessage);
+    }
+  }, [precision]);
+
   const disconnectSocket = useCallback(() => {
     socket.close();
   }, []);
@@ -87,7 +134,11 @@ const TradingScreen = () => {
         style={[styles.content]}
       >
         <Ticker />
-        <OrderBook />
+        <OrderBook
+          precision={precision}
+          decreasePrecision={decreasePrecision}
+          increasePrecision={increasePrecision}
+        />
         <Trades />
       </ScrollView>
     </View>
